@@ -1,10 +1,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { blogPosts } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { format } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { db } from '@/lib/firebase';
+import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import type { BlogPost } from '@/lib/types';
+
 
 export const metadata = {
   title: 'Blog | SEQHER',
@@ -13,7 +16,22 @@ export const metadata = {
 
 const blogHeroImage = PlaceHolderImages.find(p => p.id === 'blog-hero');
 
-export default function BlogPage() {
+async function getBlogPosts(): Promise<BlogPost[]> {
+  const postsQuery = query(collection(db, 'blogPosts'), orderBy('createdAt', 'desc'));
+  const postsSnapshot = await getDocs(postsQuery);
+  const postsList = postsSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return { 
+          id: doc.id, 
+          ...data,
+          createdAt: data.createdAt.toDate().toISOString(),
+      } as BlogPost
+  });
+  return postsList;
+}
+
+export default async function BlogPage() {
+  const blogPosts = await getBlogPosts();
   return (
     <div>
       <section className="relative h-[40vh] min-h-[300px] w-full bg-primary/20 flex items-center justify-center">

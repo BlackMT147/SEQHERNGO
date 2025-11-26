@@ -1,12 +1,13 @@
 'use server';
 
 import { z } from 'zod';
-import { blogPosts } from '@/lib/data'; // Using mock data
 import { revalidatePath } from 'next/cache';
+import { auth, db } from '@/lib/firebase';
+import { doc, setDoc, updateDoc, collection, serverTimestamp, getDoc } from 'firebase/firestore';
+import { headers } from 'next/headers';
+import type { AppUser } from '@/lib/types';
+import { onAuthStateChanged } from 'firebase/auth';
 
-// This would interact with Firestore in a real app
-// import { db } from '@/lib/firebase';
-// import { doc, setDoc, updateDoc, collection } from 'firebase/firestore';
 
 const blogPostSchema = z.object({
   id: z.string().optional(),
@@ -16,12 +17,39 @@ const blogPostSchema = z.object({
   imageId: z.string().optional(),
 });
 
+async function getCurrentUser(): Promise<AppUser | null> {
+    // This is a workaround for getting the current user in a server action.
+    // In a real app, you would have a more robust session management solution.
+    // For now, we assume this action is only called by an authenticated user.
+    // A proper solution would involve session cookies or tokens.
+    return new Promise((resolve) => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists()) {
+                    resolve({ ...user, ...userDoc.data() } as AppUser);
+                } else {
+                    resolve(null);
+                }
+            } else {
+                resolve(null);
+            }
+            unsubscribe();
+        });
+    });
+}
+
+
 export async function createOrUpdatePost(
   data: z.infer<typeof blogPostSchema>
 ) {
-    // Here you would check if the user is an admin
-    // const { user, isAdmin } = useAuth();
-    // if (!isAdmin) { return { success: false, message: 'Unauthorized' }; }
+    const user = await getCurrentUser();
+
+    // In a real app, we would get the user from the session
+    // For now, we will simulate an admin user check
+    if (!user || user.role !== 'admin') { 
+        return { success: false, message: 'Unauthorized' }; 
+    }
 
     const validation = blogPostSchema.safeParse(data);
     if (!validation.success) {
@@ -30,29 +58,31 @@ export async function createOrUpdatePost(
     
     const { id, title, content, slug, imageId } = validation.data;
     
-    // In a real app, you'd do this with Firestore:
     try {
         if (id) {
             // Update existing post
-            console.log("Updating post:", { id, ...validation.data });
-            const postIndex = blogPosts.findIndex(p => p.id === id);
-            if (postIndex > -1) {
-                blogPosts[postIndex] = { ...blogPosts[postIndex], title, content, slug, imageId: imageId || blogPosts[postIndex].imageId };
-            }
-        } else {
-            // Create new post
-            const newId = (blogPosts.length + 1).toString();
-            console.log("Creating new post:", { id: newId, ...validation.data });
-            blogPosts.push({
-                id: newId,
+            const postRef = doc(db, 'blogPosts', id);
+            await updateDoc(postRef, {
                 title,
                 content,
                 slug,
                 imageId: imageId || 'blog-community-gardens',
-                author: "Admin User", // Should come from session
-                authorId: "admin001", // Should come from session
-                createdAt: new Date().toISOString(),
             });
+            console.log("Updating post:", { id, ...validation.data });
+        } else {
+            // Create new post
+            const newPostRef = doc(collection(db, 'blogPosts'));
+            await setDoc(newPostRef, {
+                id: newPostRef.id,
+                title,
+                content,
+                slug,
+                imageId: imageId || 'blog-community-gardens',
+                author: user.displayName || "Admin User",
+                authorId: user.uid,
+                createdAt: serverTimestamp(),
+            });
+            console.log("Creating new post:", { id: newPostRef.id, ...validation.data });
         }
         
         // Revalidate paths to show updated content

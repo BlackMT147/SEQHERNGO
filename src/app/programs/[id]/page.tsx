@@ -1,23 +1,37 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { programs } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { notFound } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { db } from '@/lib/firebase';
+import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
+import type { Program } from '@/lib/types';
 
 type Props = {
   params: { id: string };
 };
 
 export async function generateStaticParams() {
-  return programs.map((program) => ({
-    id: program.id,
+  const programsCol = collection(db, 'programs');
+  const programSnapshot = await getDocs(programsCol);
+  return programSnapshot.docs.map((doc) => ({
+    id: doc.id,
   }));
 }
 
+async function getProgram(id: string): Promise<Program | null> {
+    const docRef = doc(db, 'programs', id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        return { id: docSnap.id, ...docSnap.data() } as Program;
+    }
+    return null;
+}
+
+
 export async function generateMetadata({ params }: Props) {
-  const program = programs.find((p) => p.id === params.id);
+  const program = await getProgram(params.id);
   if (!program) {
     return { title: 'Program Not Found' };
   }
@@ -27,8 +41,8 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
-export default function ProgramDetailPage({ params }: Props) {
-  const program = programs.find((p) => p.id === params.id);
+export default async function ProgramDetailPage({ params }: Props) {
+  const program = await getProgram(params.id);
 
   if (!program) {
     notFound();

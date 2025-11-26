@@ -2,6 +2,8 @@
 
 import { z } from 'zod';
 import { validateEmail } from '@/ai/flows/validate-email-with-llm';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const appointmentSchema = z.object({
   name: z.string().min(2),
@@ -40,7 +42,17 @@ export async function bookAppointment(
       };
     }
 
-    // In a real application, you would save the appointment to Firestore here.
+    // Save the appointment to Firestore
+    await addDoc(collection(db, 'appointments'), {
+      name,
+      email,
+      appointmentDate,
+      appointmentType,
+      message,
+      createdAt: serverTimestamp(),
+      status: 'pending',
+    });
+
     console.log('Booking appointment for:', {
       name,
       email,
@@ -49,7 +61,6 @@ export async function bookAppointment(
       message,
     });
     
-    // Simulate successful booking
     return { success: true, message: 'Appointment requested successfully!' };
 
   } catch (error) {

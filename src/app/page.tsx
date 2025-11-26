@@ -4,14 +4,26 @@ import { Handshake, Target, Leaf, HeartHandshake, ArrowRight } from 'lucide-reac
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { featuredPrograms } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { db } from '@/lib/firebase';
+import { collection, getDocs, limit, query } from 'firebase/firestore';
+import type { Program } from '@/lib/types';
+
 
 const heroImage = PlaceHolderImages.find(p => p.id === 'hero-community');
 const programImage1 = PlaceHolderImages.find(p => p.id === 'program-education');
 const programImage2 = PlaceHolderImages.find(p => p.id === 'program-health');
 
-export default function Home() {
+async function getFeaturedPrograms(): Promise<Program[]> {
+  const programsQuery = query(collection(db, 'programs'), limit(3));
+  const programSnapshot = await getDocs(programsQuery);
+  const programList = programSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Program));
+  return programList;
+}
+
+export default async function Home() {
+  const featuredPrograms = await getFeaturedPrograms();
+
   const impactStats = [
     { id: 1, icon: <Handshake className="h-10 w-10 text-primary" />, value: '10,000+', label: 'Lives Impacted' },
     { id: 2, icon: <Target className="h-10 w-10 text-primary" />, value: '15+', label: 'Active Programs' },

@@ -23,10 +23,27 @@ import {
 
 import { MoreHorizontal, PlusCircle } from "lucide-react";
 import Link from "next/link";
-import { blogPosts } from "@/lib/data";
 import { format } from "date-fns";
+import { db } from "@/lib/firebase";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import type { BlogPost } from "@/lib/types";
 
-export default function AdminBlogPage() {
+async function getBlogPosts(): Promise<BlogPost[]> {
+  const postsQuery = query(collection(db, 'blogPosts'), orderBy('createdAt', 'desc'));
+  const postsSnapshot = await getDocs(postsQuery);
+  const postsList = postsSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return { 
+          id: doc.id, 
+          ...data,
+          createdAt: data.createdAt.toDate().toISOString(),
+      } as BlogPost
+  });
+  return postsList;
+}
+
+export default async function AdminBlogPage() {
+  const blogPosts = await getBlogPosts();
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">

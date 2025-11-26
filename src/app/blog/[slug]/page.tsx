@@ -1,24 +1,45 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { blogPosts } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { notFound } from 'next/navigation';
 import { format } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
+import { db } from '@/lib/firebase';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import type { BlogPost } from '@/lib/types';
+
 
 type Props = {
   params: { slug: string };
 };
 
 export async function generateStaticParams() {
-  return blogPosts.map((post) => ({
-    slug: post.slug,
-  }));
+    const postsQuery = collection(db, 'blogPosts');
+    const postsSnapshot = await getDocs(postsQuery);
+    return postsSnapshot.docs.map((doc) => ({
+        slug: doc.data().slug,
+    }));
 }
 
+async function getPost(slug: string): Promise<BlogPost | null> {
+    const postsQuery = query(collection(db, 'blogPosts'), where('slug', '==', slug));
+    const querySnapshot = await getDocs(postsQuery);
+    if (querySnapshot.empty) {
+        return null;
+    }
+    const doc = querySnapshot.docs[0];
+    const data = doc.data();
+    return {
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt.toDate().toISOString(),
+    } as BlogPost;
+}
+
+
 export async function generateMetadata({ params }: Props) {
-  const post = blogPosts.find((p) => p.slug === params.slug);
+  const post = await getPost(params.slug);
   if (!post) {
     return { title: 'Post Not Found' };
   }
@@ -28,8 +49,8 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
-export default function BlogPostPage({ params }: Props) {
-  const post = blogPosts.find((p) => p.slug === params.slug);
+export default async function BlogPostPage({ params }: Props) {
+  const post = await getPost(params.slug);
 
   if (!post) {
     notFound();

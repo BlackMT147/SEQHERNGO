@@ -1,13 +1,30 @@
-import { blogPosts } from "@/lib/data";
 import { notFound } from 'next/navigation';
 import BlogForm from "../../BlogForm";
+import { db } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import type { BlogPost } from '@/lib/types';
+
 
 type Props = {
     params: { id: string }
 }
 
-export default function EditBlogPostPage({ params }: Props) {
-    const post = blogPosts.find(p => p.id === params.id);
+async function getPost(id: string): Promise<BlogPost | null> {
+    const docRef = doc(db, 'blogPosts', id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        const data = docSnap.data();
+        return {
+            id: docSnap.id,
+            ...data,
+            createdAt: data.createdAt.toDate().toISOString(),
+        } as BlogPost;
+    }
+    return null;
+}
+
+export default async function EditBlogPostPage({ params }: Props) {
+    const post = await getPost(params.id);
     if (!post) {
         notFound();
     }

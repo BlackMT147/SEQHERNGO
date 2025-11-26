@@ -1,11 +1,14 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { programs } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { db } from '@/lib/firebase';
+import { collection, getDocs } from 'firebase/firestore';
+import type { Program } from '@/lib/types';
+
 
 export const metadata = {
   title: 'Our Programs | SEQHER',
@@ -14,7 +17,15 @@ export const metadata = {
 
 const programsHeroImage = PlaceHolderImages.find(p => p.id === 'programs-hero');
 
-export default function ProgramsPage() {
+async function getPrograms(): Promise<Program[]> {
+  const programsCol = collection(db, 'programs');
+  const programSnapshot = await getDocs(programsCol);
+  const programList = programSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Program));
+  return programList;
+}
+
+export default async function ProgramsPage() {
+  const programs = await getPrograms();
   return (
     <div>
       <section className="relative h-[40vh] min-h-[300px] w-full bg-primary/20 flex items-center justify-center">
