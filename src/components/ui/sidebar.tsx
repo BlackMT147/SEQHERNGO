@@ -83,8 +83,20 @@ const SidebarProvider = React.forwardRef<
           _setOpen(openState)
         }
 
-        // This sets the cookie to keep the sidebar state.
-        document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+        // Persist sidebar state in localStorage instead of a cookie to avoid
+        // creating client-set cookies (which cannot be HttpOnly) and reduce
+        // cookie attack surface. Server-side state should use secure, HttpOnly
+        // cookies set from the server when needed.
+        try {
+          window.localStorage.setItem(SIDEBAR_COOKIE_NAME, String(openState));
+        } catch (e) {
+          // Fallback to cookie if localStorage is not available (very rare).
+          // If using cookies on the client, prefer `__Secure-` or `__Host-`
+          // prefixes and set them from the server with Secure and HttpOnly
+          // flags. Client-set cookies cannot be HttpOnly so avoid storing
+          // sensitive information here.
+          document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
+        }
       },
       [setOpenProp, open]
     )

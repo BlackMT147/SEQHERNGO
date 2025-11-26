@@ -12,6 +12,16 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+// WARNING: This file initializes the Firebase client SDK and runs in the
+// browser. Never place service account credentials, admin secrets, or any
+// server-only keys here. For privileged server-side operations (user role
+// management, Firestore admin writes, secret rotation), use the Firebase
+// Admin SDK on server-only code (API routes, server functions) where
+// environment variables are not exposed to the client bundle.
+// Example (server-only):
+// import { initializeApp, cert } from 'firebase-admin/app'
+// initializeApp({ credential: cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)) })
+
 // Initialize Firebase
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
