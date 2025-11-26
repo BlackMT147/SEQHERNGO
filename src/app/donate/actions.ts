@@ -4,7 +4,10 @@ import { stripe } from '@/lib/stripe';
 import { headers } from 'next/headers';
 
 export async function createCheckoutSession(amount: number) {
-  const origin = headers().get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:9002';
+  // In Next.js server components `headers()` is async-like; await it
+  // before calling .get(). Also guard fallback origins.
+  const hdrs = await headers();
+  const origin = (hdrs.get('origin') as string | null) || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:9002';
   
   if (!amount || amount < 5) {
       throw new Error("Invalid donation amount.");

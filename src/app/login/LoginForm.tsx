@@ -55,6 +55,12 @@ export default function LoginForm() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
     try {
+      if (!auth) {
+        toast({ title: 'Authentication Unavailable', description: 'Firebase Auth is not configured.', variant: 'destructive' });
+        setLoading(false);
+        return;
+      }
+
       if (isLogin) {
         await signInWithEmailAndPassword(auth, values.email, values.password);
         toast({ title: "Success", description: "Logged in successfully." });
@@ -65,11 +71,7 @@ export default function LoginForm() {
           setLoading(false);
           return;
         }
-        const userCredential = await createUserWithEmailAndPassword(
-          auth,
-          values.email,
-          values.password
-        );
+        const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
         await updateProfile(userCredential.user, { displayName: values.name });
         toast({ title: "Welcome!", description: "Account created successfully." });
         router.push('/appointment');

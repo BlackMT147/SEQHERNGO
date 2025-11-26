@@ -43,8 +43,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
 
+    // Keep a reference to the Firestore onSnapshot unsubscribe so we can
+    // clean it up when the auth state changes or when the effect unmounts.
+    let unsubSnapshot: (() => void) | null = null;
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: User | null) => {
+      // If user signed out, clear state and remove any existing snapshot listener.
       if (!firebaseUser) {
+        if (unsubSnapshot) {
+          try { unsubSnapshot(); } catch (e) { /* ignore */ }
+          unsubSnapshot = null;
+        }
         setUser(null);
         setLoading(false);
         return;
@@ -53,31 +62,38 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // If Firestore isn't configured, create a minimal public user from the
       // firebaseUser object and skip profile reads/writes.
       if (!db) {
-        const publicUser: AppUser = {
+        const publicUser = {
           uid: firebaseUser.uid,
-          email: firebaseUser.email ?? undefined,
-          displayName: firebaseUser.displayName ?? undefined,
+          email: firebaseUser.email ?? null,
+          displayName: firebaseUser.displayName ?? null,
           role: 'user',
-        };
+        } as unknown as AppUser;
         setUser(publicUser);
         setLoading(false);
         return;
       }
 
+      // If there is an existing snapshot listener for a previous user, remove it
+      // before attaching a new one for the currently-signed-in user.
+      if (unsubSnapshot) {
+        try { unsubSnapshot(); } catch (e) { /* ignore */ }
+        unsubSnapshot = null;
+      }
+
       const userRef = doc(db, 'users', firebaseUser.uid);
 
       // Listen for real-time updates to the user's profile
-      const unsubSnapshot = onSnapshot(userRef, async (docSnap) => {
+      unsubSnapshot = onSnapshot(userRef, async (docSnap) => {
         if (docSnap.exists()) {
           // User profile exists, merge allowed fields with firebase user
           const userProfile = docSnap.data() as UserProfile;
           // Only expose a minimal public-facing shape to React context
-          const publicUser: AppUser = {
+          const publicUser = {
             uid: firebaseUser.uid,
             email: firebaseUser.email ?? userProfile.email,
-            displayName: userProfile.displayName ?? firebaseUser.displayName ?? undefined,
+            displayName: userProfile.displayName ?? firebaseUser.displayName ?? null,
             role: userProfile.role ?? 'user',
-          };
+          } as unknown as AppUser;
           setUser(publicUser);
         } else {
           // New user: create a profile but DO NOT auto-promote to admin.
@@ -85,26 +101,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           // server-side process or CLI by the project maintainers.
           const newUserProfile: UserProfile = {
             uid: firebaseUser.uid,
-            email: firebaseUser.email ?? undefined,
-            displayName: firebaseUser.displayName ?? undefined,
+            email: firebaseUser.email ?? null,
+            displayName: firebaseUser.displayName ?? null,
             role: 'user',
           };
           await setDoc(userRef, newUserProfile);
-          const publicUser: AppUser = {
+          const publicUser = {
             uid: firebaseUser.uid,
             email: newUserProfile.email,
             displayName: newUserProfile.displayName,
             role: newUserProfile.role,
-          };
+          } as unknown as AppUser;
           setUser(publicUser);
         }
         setLoading(false);
       });
-
-      return () => unsubSnapshot();
     });
 
-    return () => unsubscribe();
+    return () => {
+      if (unsubSnapshot) {
+        try { unsubSnapshot(); } catch (e) { /* ignore */ }
+        unsubSnapshot = null;
+      }
+      unsubscribe();
+    };
   }, [auth, db]);
 
   const signOut = async () => {

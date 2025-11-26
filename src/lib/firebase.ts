@@ -92,8 +92,12 @@ if (hasFirebaseClientConfig && typeof window !== 'undefined') {
             }
         }
     }
-} else if (!hasFirebaseClientConfig) {
-    // Helpful message during development — don't throw, just act as a no-op.
+}
+
+// Helpful message during development — don't throw, just act as a no-op.
+// Separate `if` keeps the logic explicit and avoids confusing `else` chains
+// when this file is evaluated server-side (where `window` is undefined).
+if (!hasFirebaseClientConfig) {
     if (process.env.NODE_ENV === 'development') {
         // Use console.debug to avoid noisy logs in production.
         // eslint-disable-next-line no-console

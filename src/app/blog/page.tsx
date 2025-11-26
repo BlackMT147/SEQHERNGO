@@ -17,15 +17,35 @@ export const metadata = {
 const blogHeroImage = PlaceHolderImages.find(p => p.id === 'blog-hero');
 
 async function getBlogPosts(): Promise<BlogPost[]> {
+  // If Firestore isn't configured, avoid calling any Firestore helpers
+  // and return an empty list. This keeps the app runnable without Firebase.
+  if (!db) return [];
+
   const postsQuery = query(collection(db, 'blogPosts'), orderBy('createdAt', 'desc'));
   const postsSnapshot = await getDocs(postsQuery);
   const postsList = postsSnapshot.docs.map(doc => {
-      const data = doc.data();
-      return { 
-          id: doc.id, 
+      const data = doc.data() as any;
+
+      // Normalize createdAt to an ISO string. Firestore Timestamps have a
+      // toDate() helper; otherwise accept strings or fallback to now.
+      let createdAtIso: string;
+      try {
+        if (data?.createdAt?.toDate) {
+          createdAtIso = data.createdAt.toDate().toISOString();
+        } else if (typeof data?.createdAt === 'string') {
+          createdAtIso = data.createdAt;
+        } else {
+          createdAtIso = new Date().toISOString();
+        }
+      } catch (e) {
+        createdAtIso = new Date().toISOString();
+      }
+
+      return {
+          id: doc.id,
           ...data,
-          createdAt: data.createdAt.toDate().toISOString(),
-      } as BlogPost
+          createdAt: createdAtIso,
+      } as BlogPost;
   });
   return postsList;
 }
