@@ -15,7 +15,17 @@ const programImage1 = PlaceHolderImages.find(p => p.id === 'program-education');
 const programImage2 = PlaceHolderImages.find(p => p.id === 'program-health');
 
 async function getFeaturedPrograms(): Promise<Program[]> {
-  const programsQuery = query(collection(db, 'programs'), limit(3));
+  // If Firestore client isn't initialized (e.g., running on server without
+  // client Firebase config), return an empty list. In production you should
+  // initialize and use a server-side Firebase Admin SDK for server data
+  // fetching instead of the client SDK.
+  if (!db) return [];
+
+  // TypeScript: db is non-null here but its type includes null. Cast to
+  // Firestore to satisfy the collection/getDocs helpers.
+  const clientDb = db as any;
+
+  const programsQuery = query(collection(clientDb, 'programs'), limit(3));
   const programSnapshot = await getDocs(programsQuery);
   const programList = programSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Program));
   return programList;
