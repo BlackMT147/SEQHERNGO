@@ -13,7 +13,10 @@ if (!webhookSecret) {
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
-  const signature = headers().get('stripe-signature');
+  // In Next.js 15 the `headers()` helper may be async/Promise-typed in this
+  // environment; await it to satisfy the type system and runtime.
+  const hdrs = await headers();
+  const signature = hdrs.get('stripe-signature');
 
   if (!signature) {
     console.warn('Missing stripe-signature header');
@@ -46,6 +49,11 @@ export async function POST(req: NextRequest) {
         }
 
         // Idempotency: use session id as document id to avoid duplicates
+        if (!db) {
+          console.error('Firestore not configured - cannot persist donation');
+          break;
+        }
+
         const docRef = doc(db, 'donations', session.id);
         await setDoc(docRef, {
           stripeSessionId: session.id,
