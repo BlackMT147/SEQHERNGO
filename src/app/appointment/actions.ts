@@ -43,6 +43,11 @@ export async function bookAppointment(
     }
 
     // Save the appointment to Firestore
+    if (!db) {
+      console.error('Firestore not configured - cannot save appointment');
+      return { success: false, message: 'Server error: database not configured.' };
+    }
+
     await addDoc(collection(db, 'appointments'), {
       name,
       email,
