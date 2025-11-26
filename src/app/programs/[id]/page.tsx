@@ -6,39 +6,27 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { db } from '@/lib/firebase';
 import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
-import { firestore as adminDb } from '@/lib/firebaseAdmin';
 import type { Program } from '@/lib/types';
 
 
 export async function generateStaticParams() {
-  if (adminDb) {
-    const snapshot = await adminDb.collection('programs').get();
-    return snapshot.docs.map((d) => ({ id: d.id }));
-  }
-
   if (!db) return [];
 
-  const programsCol = collection(db!, 'programs');
+  const programsCol = collection(db, 'programs');
   const programSnapshot = await getDocs(programsCol);
   return programSnapshot.docs.map((doc) => ({ id: doc.id }));
 }
 
 async function getProgram(id: string): Promise<Program | null> {
-  if (adminDb) {
-    const d = await adminDb.collection('programs').doc(id).get();
-    if (!d.exists) return null;
-    return { id: d.id, ...(d.data() as Program) };
-  }
-
   if (!db) return null;
 
-  const programDocRef = doc(db!, 'programs', id);
+  const programDocRef = doc(db, 'programs', id);
   const programSnap = await getDoc(programDocRef);
   if (!programSnap.exists()) return null;
-  return { id: programSnap.id, ...(programSnap.data() as Program) };
+  return { id: programSnap.id, ...(programSnap.data() as Omit<Program, 'id'>) };
 }
 
-export async function generateMetadata({ params }: Props) {
+export async function generateMetadata({ params }: { params: { id: string } }) {
   const program = await getProgram(params.id);
   if (!program) {
     return { title: 'Program Not Found' };
@@ -49,7 +37,7 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
-export default async function ProgramDetailPage({ params }: Props) {
+export default async function ProgramDetailPage({ params }: { params: { id: string } }) {
   const program = await getProgram(params.id);
 
   if (!program) {

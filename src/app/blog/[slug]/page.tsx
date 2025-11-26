@@ -7,17 +7,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
-import { firestore as adminDb } from '@/lib/firebaseAdmin';
 import type { BlogPost } from '@/lib/types';
 
 
 
 export async function generateStaticParams() {
-  if (adminDb) {
-    const snapshot = await adminDb.collection('blogPosts').get();
-    return snapshot.docs.map((d) => ({ slug: d.data().slug }));
-  }
-
   if (!db) return [];
 
   const postsQuery = collection(db, 'blogPosts');
@@ -26,18 +20,6 @@ export async function generateStaticParams() {
 }
 
 async function getPost(slug: string): Promise<BlogPost | null> {
-    if (adminDb) {
-      const snapshot = await adminDb.collection('blogPosts').where('slug', '==', slug).get();
-      if (snapshot.empty) return null;
-      const d = snapshot.docs[0];
-      const data = d.data();
-      return {
-        id: d.id,
-        ...data,
-        createdAt: data.createdAt ? data.createdAt.toDate().toISOString() : null,
-      } as BlogPost;
-    }
-
     if (!db) return null;
 
     const postsQuery = query(collection(db, 'blogPosts'), where('slug', '==', slug));
@@ -50,12 +32,12 @@ async function getPost(slug: string): Promise<BlogPost | null> {
     return {
         id: doc.id,
         ...data,
-        createdAt: data.createdAt.toDate().toISOString(),
+        createdAt: data.createdAt?.toDate?.()?.toISOString?.() ?? null,
     } as BlogPost;
 }
 
 
-export async function generateMetadata({ params }: Props) {
+export async function generateMetadata({ params }: { params: { slug: string } }) {
   const post = await getPost(params.slug);
   if (!post) {
     return { title: 'Post Not Found' };
@@ -66,7 +48,7 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
-export default async function BlogPostPage({ params }: Props) {
+export default async function BlogPostPage({ params }: { params: { slug: string } }) {
   const post = await getPost(params.slug);
 
   if (!post) {
