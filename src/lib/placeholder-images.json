@@ -1,3 +1,94 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-community",
+      "description": "A diverse group of community members working together on a project.",
+      "imageUrl": "https://images.unsplash.com/photo-1761666507437-9fb5a6ef7b0a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxjb21tdW5pdHklMjB2b2x1bnRlZXJzfGVufDB8fHx8MTc2NDA4MjMzOHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "community volunteers"
+    },
+    {
+      "id": "program-education",
+      "description": "Children in an outdoor classroom learning about nature.",
+      "imageUrl": "https://images.unsplash.com/flagged/photo-1574097656146-0b43b7660cb6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjaGlsZHJlbiUyMGVkdWNhdGlvbnxlbnwwfHx8fDE3NjQxMTU4NjJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "children education"
+    },
+    {
+      "id": "program-health",
+      "description": "A healthcare worker providing a check-up to a smiling elderly person.",
+      "imageUrl": "https://images.unsplash.com/photo-1715810491182-725428245fe2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxoZWFsdGhjYXJlJTIwY29tbXVuaXR5fGVufDB8fHx8MTc2NDE1ODg2OHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "healthcare community"
+    },
+    {
+      "id": "program-empowerment",
+      "description": "A woman starting her own small business at a local market.",
+      "imageUrl": "https://images.unsplash.com/photo-1449247666642-264389f5f5b1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxzbWFsbCUyMGJ1c2luZXNzfGVufDB8fHx8MTc2NDEzNDc2M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "small business"
+    },
+    {
+      "id": "program-sustainability",
+      "description": "Volunteers planting trees in a deforested area.",
+      "imageUrl": "https://images.unsplash.com/photo-1591255199673-4e2b706645a2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHx0cmVlJTIwcGxhbnRpbmd8ZW58MHx8fHwxNzY0MTU4ODY4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "tree planting"
+    },
+    {
+      "id": "program-water",
+      "description": "A newly installed clean water pump in a village.",
+      "imageUrl": "https://images.unsplash.com/photo-1542013936693-884638332954?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxjbGVhbiUyMHdhdGVyfGVufDB8fHx8MTc2NDA2MzAyOHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "clean water"
+    },
+    {
+      "id": "blog-climate-action",
+      "description": "A dramatic photo of a glacier melting into the ocean.",
+      "imageUrl": "https://images.unsplash.com/photo-1562089727-90aa996a6f18?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxjbGltYXRlJTIwY2hhbmdlfGVufDB8fHx8MTc2NDE1ODg2OHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "climate change"
+    },
+    {
+      "id": "blog-community-gardens",
+      "description": "An urban community garden with fresh vegetables.",
+      "imageUrl": "https://images.unsplash.com/photo-1461354464878-ad92f492a5a0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxjb21tdW5pdHklMjBnYXJkZW58ZW58MHx8fHwxNzY0MTI0NjIwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "community garden"
+    },
+    {
+      "id": "blog-volunteer-story",
+      "description": "A portrait of a smiling volunteer.",
+      "imageUrl": "https://images.unsplash.com/photo-1748200100199-fed2be4c31eb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHx2b2x1bnRlZXIlMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjQwODg1Mjl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "volunteer portrait"
+    },
+    {
+      "id": "avatar-1",
+      "description": "Avatar of a person",
+      "imageUrl": "https://images.unsplash.com/photo-1594616838951-c155f8d978a0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxwZXJzb24lMjBhdmF0YXJ8ZW58MHx8fHwxNzY0MTExMDM1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person avatar"
+    },
+    {
+      "id": "avatar-2",
+      "description": "Avatar of another person",
+      "imageUrl": "https://images.unsplash.com/photo-1639149888905-fb39731f2e6c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwZXJzb24lMjBhdmF0YXJ8ZW58MHx8fHwxNzY0MTExMDM1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person avatar"
+    },
+    {
+      "id": "donate-hero",
+      "description": "Hands holding a small plant sprouting from the soil.",
+      "imageUrl": "https://images.unsplash.com/photo-1555597972-3bf94ed53453?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxoYW5kcyUyMHBsYW50fGVufDB8fHx8MTc2NDA5NzU0M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "hands plant"
+    },
+    {
+      "id": "appointment-hero",
+      "description": "A person writing in a planner at a desk.",
+      "imageUrl": "https://images.unsplash.com/photo-1739722066916-36144c6a2ec1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxwbGFubmluZyUyMHNjaGVkdWxlfGVufDB8fHx8MTc2NDE1ODg2OHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "planning schedule"
+    },
+    {
+      "id": "programs-hero",
+      "description": "A panoramic view of a diverse landscape showing mountains and a village.",
+      "imageUrl": "https://images.unsplash.com/photo-1708037429826-de89ac0dd6c7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxsYW5kc2NhcGUlMjB2aWxsYWdlfGVufDB8fHx8MTc2NDE1ODg2OHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "landscape village"
+    },
+    {
+      "id": "blog-hero",
+      "description": "A person writing in a notebook with a laptop nearby.",
+      "imageUrl": "https://images.unsplash.com/photo-1485322551133-3a4c27a9d925?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHx3cml0aW5nJTIwYmxvZ3xlbnwwfHx8fDE3NjQxNTg4Njh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "writing blog"
+    }
+  ]
 }
