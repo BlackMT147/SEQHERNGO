@@ -30,6 +30,8 @@ import type { BlogPost } from "@/lib/types";
 import DeletePostButton from "./DeletePostButton";
 
 async function getBlogPosts(): Promise<BlogPost[]> {
+  if (!db) return [];
+
   const postsQuery = query(collection(db, 'blogPosts'), orderBy('createdAt', 'desc'));
   const postsSnapshot = await getDocs(postsQuery);
   const postsList = postsSnapshot.docs.map(doc => {
