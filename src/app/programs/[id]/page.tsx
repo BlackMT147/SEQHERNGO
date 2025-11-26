@@ -26,8 +26,9 @@ async function getProgram(id: string): Promise<Program | null> {
   return { id: programSnap.id, ...(programSnap.data() as Omit<Program, 'id'>) };
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
-  const program = await getProgram(params.id);
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const program = await getProgram(id);
   if (!program) {
     return { title: 'Program Not Found' };
   }
@@ -37,8 +38,9 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
   };
 }
 
-export default async function ProgramDetailPage({ params }: { params: { id: string } }) {
-  const program = await getProgram(params.id);
+export default async function ProgramDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const program = await getProgram(id);
 
   if (!program) {
     notFound();

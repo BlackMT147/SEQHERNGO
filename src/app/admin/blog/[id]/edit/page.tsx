@@ -20,8 +20,9 @@ async function getPost(id: string): Promise<BlogPost | null> {
     return null;
 }
 
-export default async function EditBlogPostPage({ params }: { params: { id: string } }) {
-    const post = await getPost(params.id);
+export default async function EditBlogPostPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
+    const post = await getPost(id);
     if (!post) {
         notFound();
     }
