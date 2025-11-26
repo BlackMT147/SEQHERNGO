@@ -23,12 +23,16 @@ async function getAdminUser(): Promise<AppUser | null> {
     // For this project, we'll assume the user object is available through auth state.
     // In a real production app, this would need to be replaced with a secure
     // server-side session check.
-    const user = auth.currentUser;
+    // auth may be null when Firebase is not configured; guard against that.
+    const user = auth?.currentUser ?? null;
     if (!user) return null;
 
+    if (!db) return null;
+
     const userDoc = await getDoc(doc(db, "users", user.uid));
-    if (userDoc.exists() && userDoc.data().role === 'admin') {
-        return { ...user, ...userDoc.data() } as AppUser;
+    const data = userDoc.exists() ? userDoc.data() : null;
+    if (data && (data as any).role === 'admin') {
+        return { ...(user as any), ...(data as any) } as AppUser;
     }
     return null;
 }
@@ -39,8 +43,8 @@ export async function createOrUpdatePost(
 ) {
     const user = await getAdminUser();
 
-    if (!user) { 
-        return { success: false, message: 'Unauthorized: You must be an admin to perform this action.' }; 
+    if (!user) {
+        return { success: false, message: 'Unauthorized: You must be an admin to perform this action.' };
     }
 
     const validation = blogPostSchema.safeParse(data);
@@ -49,6 +53,10 @@ export async function createOrUpdatePost(
     }
     
     const { id, title, content, slug, imageId } = validation.data;
+
+    if (!db) {
+        return { success: false, message: 'Server error: database not configured.' };
+    }
     
     try {
         if (id) {
@@ -93,6 +101,10 @@ export async function deletePost(postId: string) {
     const user = await getAdminUser();
     if (!user) {
         return { success: false, message: 'Unauthorized: You must be an admin to perform this action.' };
+    }
+
+    if (!db) {
+        return { success: false, message: 'Server error: database not configured.' };
     }
 
     if (!postId) {
