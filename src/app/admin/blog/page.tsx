@@ -27,6 +27,7 @@ import { format } from "date-fns";
 import { db } from "@/lib/firebase";
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import type { BlogPost } from "@/lib/types";
+import DeletePostButton from "./DeletePostButton";
 
 async function getBlogPosts(): Promise<BlogPost[]> {
   const postsQuery = query(collection(db, 'blogPosts'), orderBy('createdAt', 'desc'));
@@ -36,7 +37,8 @@ async function getBlogPosts(): Promise<BlogPost[]> {
       return { 
           id: doc.id, 
           ...data,
-          createdAt: data.createdAt.toDate().toISOString(),
+          // Convert Firestore Timestamp to ISO string, if it's not already a string
+          createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : new Date().toISOString(),
       } as BlogPost
   });
   return postsList;
@@ -80,6 +82,7 @@ export default async function AdminBlogPage() {
                 <TableRow key={post.id}>
                   <TableCell className="font-medium">
                     <Link href={`/blog/${post.slug}`} className="hover:underline" target="_blank">{post.title}</Link>
+
                   </TableCell>
                   <TableCell className="hidden md:table-cell">{post.author}</TableCell>
                   <TableCell className="hidden md:table-cell">
@@ -97,7 +100,9 @@ export default async function AdminBlogPage() {
                             <DropdownMenuItem asChild>
                                 <Link href={`/admin/blog/${post.id}/edit`}>Edit</Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                               <DeletePostButton postId={post.id} postTitle={post.title} />
+                            </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
