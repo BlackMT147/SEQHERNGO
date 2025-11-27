@@ -39,13 +39,6 @@ NEXT_PUBLIC_FIREBASE_PROJECT_ID=
 NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
 NEXT_PUBLIC_FIREBASE_APP_ID=
-
-# Stripe Configuration
-# Get these from your Stripe dashboard
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
-STRIPE_SECRET_KEY=
-STRIPE_WEBHOOK_SECRET=
-
 # App URL
 # The base URL of your deployed app (e.g., for Stripe redirects)
 # For local development, this is typically http://localhost:9002
